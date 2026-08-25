@@ -1,0 +1,30 @@
+# Environnement virtuel
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Données et modèles 
+data/*.csv
+modele/*.pkl
+*.pkl
+
+# MLflow
+mlruns/
+mlflow.db
+
+# Variables d'environnement
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
