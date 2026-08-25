@@ -1,4 +1,6 @@
 import pandas as pd
+import joblib
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -58,6 +60,19 @@ def evaluer_modele(modele, X_VALIDATION_STD, Y_VALIDATION):
 
     print(classification_report(Y_VALIDATION, predictions, target_names=["Pas d'AVC", "AVC"]))
     print("ROC-AUC :", round(roc_auc_score(Y_VALIDATION, probabilites), 4))
+    
+def sauvegarder_artefact(modele, scaler, colonnesNumeriques, colonnesFeatures, chemin_sortie):
+    os.makedirs(os.path.dirname(chemin_sortie), exist_ok=True)
+
+    artefact = {
+        "modele": modele,
+        "scaler": scaler,
+        "colonnes_numeriques": colonnesNumeriques,
+        "colonnes_features": colonnesFeatures,
+    }
+
+    joblib.dump(artefact, chemin_sortie)
+    print("\nArtefact sauvegarde dans :", chemin_sortie)
 
 
 if __name__ == "__main__":
@@ -87,3 +102,8 @@ if __name__ == "__main__":
     modele = entrainer_modele(X_APPRENTISSAGE_STD, Y_APPRENTISSAGE)
     print("\nModele entraine")
     evaluer_modele(modele, X_VALIDATION_STD, Y_VALIDATION)
+    
+    sauvegarder_artefact(
+        modele, scaler, colonnesNumeriques, list(X.columns),
+        "modele/modele_avc.pkl"
+    )
