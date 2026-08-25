@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, roc_auc_score
 
 
 def charger_donnees(chemin_csv):
@@ -44,6 +46,19 @@ def standardiser_donnees(X_APPRENTISSAGE, X_VALIDATION, colonnesNumeriques):
 
     return X_APPRENTISSAGE_STD, X_VALIDATION_STD, scaler
 
+def entrainer_modele(X_APPRENTISSAGE_STD, Y_APPRENTISSAGE):
+    modele = LogisticRegression(max_iter=1000, class_weight='balanced')
+    modele.fit(X_APPRENTISSAGE_STD, Y_APPRENTISSAGE)
+    return modele
+
+
+def evaluer_modele(modele, X_VALIDATION_STD, Y_VALIDATION):
+    predictions = modele.predict(X_VALIDATION_STD)
+    probabilites = modele.predict_proba(X_VALIDATION_STD)[:, 1]
+
+    print(classification_report(Y_VALIDATION, predictions, target_names=["Pas d'AVC", "AVC"]))
+    print("ROC-AUC :", round(roc_auc_score(Y_VALIDATION, probabilites), 4))
+
 
 if __name__ == "__main__":
     nosPatients = charger_donnees("data/healthcare-dataset-stroke-data.csv")
@@ -68,3 +83,7 @@ if __name__ == "__main__":
     )
     print("Standardisation terminee")
     print(X_APPRENTISSAGE_STD[colonnesNumeriques].describe().loc[['mean', 'std']].round(4))
+    
+    modele = entrainer_modele(X_APPRENTISSAGE_STD, Y_APPRENTISSAGE)
+    print("\nModele entraine")
+    evaluer_modele(modele, X_VALIDATION_STD, Y_VALIDATION)
