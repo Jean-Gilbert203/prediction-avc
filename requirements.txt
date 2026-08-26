@@ -1,4 +1,5 @@
 pandas
+numpy
 matplotlib
 seaborn
 scikit-learn
@@ -9,3 +10,6 @@ uvicorn
 evidently
 dvc-gdrive
 imbalanced-learn
+jupyter
+joblib
+pytest
