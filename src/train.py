@@ -4,8 +4,11 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.metrics import classification_report, roc_auc_score, recall_score
+import mlflow
+import mlflow.sklearn
 
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
 
 def charger_donnees(chemin_csv):
     nosPatients = pd.read_csv(chemin_csv)
@@ -97,11 +100,28 @@ if __name__ == "__main__":
         X_APPRENTISSAGE, X_VALIDATION, colonnesNumeriques
     )
     print("Standardisation terminee")
-    print(X_APPRENTISSAGE_STD[colonnesNumeriques].describe().loc[['mean', 'std']].round(4))
     
-    modele = entrainer_modele(X_APPRENTISSAGE_STD, Y_APPRENTISSAGE)
-    print("\nModele entraine")
-    evaluer_modele(modele, X_VALIDATION_STD, Y_VALIDATION)
+    mlflow.set_experiment("prediction-avc")
+    
+    with mlflow.start_run():
+        mlflow.log_param("modele", "LogisticRegression")
+        mlflow.log_param("class_weight", "balanced")
+        mlflow.log_param("max_iter", 1000)
+        
+        modele = entrainer_modele(X_APPRENTISSAGE_STD, Y_APPRENTISSAGE)
+        print("\nModele entraine")
+        
+        predictions = modele.predict(X_VALIDATION_STD)
+        probabilites = modele.predict_proba(X_VALIDATION_STD)[:, 1]
+
+        print(classification_report(Y_VALIDATION, predictions, target_names=["Pas d'AVC", "AVC"]))
+        recall = recall_score(Y_VALIDATION, predictions)
+        rocauc = roc_auc_score(Y_VALIDATION, probabilites)
+        print("ROC-AUC :", round(rocauc, 4))
+
+        mlflow.log_metric("recall", recall)
+        mlflow.log_metric("roc_auc", rocauc)
+        mlflow.sklearn.log_model(modele, "modele_avc")
     
     sauvegarder_artefact(
         modele, scaler, colonnesNumeriques, list(X.columns),
