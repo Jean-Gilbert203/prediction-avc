@@ -1,0 +1,5 @@
+outs:
+- md5: 5064ca1cb558ce596dbd1966eef4f16a
+  size: 2581
+  hash: md5
+  path: modele_avc.pkl
