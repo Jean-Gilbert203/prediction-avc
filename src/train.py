@@ -4,7 +4,7 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, roc_auc_score, recall_score
+from sklearn.metrics import classification_report, roc_auc_score, recall_score, precision_score, f1_score, confusion_matrix
 import mlflow
 import mlflow.sklearn
 
@@ -118,6 +118,19 @@ if __name__ == "__main__":
         recall = recall_score(Y_VALIDATION, predictions)
         rocauc = roc_auc_score(Y_VALIDATION, probabilites)
         print("ROC-AUC :", round(rocauc, 4))
+        
+        precision = precision_score(Y_VALIDATION, predictions, zero_division=0)
+        f1 = f1_score(Y_VALIDATION, predictions, zero_division=0)
+
+        mlflow.log_metric("precision", precision)
+        mlflow.log_metric("f1_score", f1)
+
+        matrice = confusion_matrix(Y_VALIDATION, predictions)
+        print("\nMatrice de confusion :")
+        print(matrice)
+
+        rapport = classification_report(Y_VALIDATION, predictions, target_names=["Pas d'AVC", "AVC"])
+        mlflow.log_text(rapport, "classification_report.txt")
 
         mlflow.log_metric("recall", recall)
         mlflow.log_metric("roc_auc", rocauc)
