@@ -13,3 +13,4 @@ imbalanced-learn
 jupyter
 joblib
 pytest
+pydantic
