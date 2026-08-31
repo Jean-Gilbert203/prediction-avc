@@ -2,6 +2,7 @@ import pandas as pd
 import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 app = FastAPI(title="API Prediction AVC")
 
@@ -20,17 +21,19 @@ def accueil():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
 class Patient(BaseModel):
-    gender: str
-    age: float
-    hypertension: int
-    heart_disease: int
-    ever_married: str
+    gender: str = Field(..., pattern="^(Male|Female)$")
+    age: float = Field(..., ge=0, le=120)
+    hypertension: int = Field(..., ge=0, le=1)
+    heart_disease: int = Field(..., ge=0, le=1)
+    ever_married: str = Field(..., pattern="^(Yes|No)$")
     work_type: str
-    Residence_type: str
-    avg_glucose_level: float
-    bmi: float
+    Residence_type: str = Field(..., pattern="^(Urban|Rural)$")
+    avg_glucose_level: float = Field(..., gt=0)
+    bmi: float = Field(..., gt=0)
     smoking_status: str
+
 
 
 @app.post("/predict")
