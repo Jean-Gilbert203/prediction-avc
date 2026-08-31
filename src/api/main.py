@@ -3,6 +3,7 @@ import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel
 from pydantic import BaseModel, Field
+from fastapi import HTTPException
 
 app = FastAPI(title="API Prediction AVC")
 
@@ -38,29 +39,33 @@ class Patient(BaseModel):
 
 @app.post("/predict")
 def predict(patient: Patient):
-    df = pd.DataFrame([patient.dict()])
+    try:
+        df = pd.DataFrame([patient.dict()])
 
-    colonnes_categorielles = ['gender', 'ever_married', 'work_type',
-                               'Residence_type', 'smoking_status']
-    df = pd.get_dummies(df, columns=colonnes_categorielles, drop_first=True)
+        colonnes_categorielles = ['gender', 'ever_married', 'work_type',
+                                'Residence_type', 'smoking_status']
+        df = pd.get_dummies(df, columns=colonnes_categorielles, drop_first=True)
 
-    df = df.reindex(columns=colonnes_features, fill_value=0)
+        df = df.reindex(columns=colonnes_features, fill_value=0)
 
-    df[colonnes_numeriques] = scaler.transform(df[colonnes_numeriques])
+        df[colonnes_numeriques] = scaler.transform(df[colonnes_numeriques])
 
-    prediction = modele.predict(df)[0]
-    probabilite = modele.predict_proba(df)[0][1]
+        prediction = modele.predict(df)[0]
+        probabilite = modele.predict_proba(df)[0][1]
 
-    pourcentage = round(float(probabilite) * 100, 2)
-    if pourcentage >= 50:
-        niveau_risque = "eleve"
-    elif pourcentage >= 20:
-        niveau_risque = "modere"
-    else:
-        niveau_risque = "faible"
+        pourcentage = round(float(probabilite) * 100, 2)
+        if pourcentage >= 50:
+            niveau_risque = "eleve"
+        elif pourcentage >= 20:
+            niveau_risque = "modere"
+        else:
+            niveau_risque = "faible"
 
-    return {
-        "stroke_risque": int(prediction),
-        "probabilite": round(float(probabilite), 4),
-        "niveau_risque": niveau_risque
-    }
+        return {
+            "stroke_risque": int(prediction),
+            "probabilite": round(float(probabilite), 4),
+            "niveau_risque": niveau_risque
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur de prediction : {str(e)}")
+
