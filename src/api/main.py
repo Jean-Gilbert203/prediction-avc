@@ -4,6 +4,11 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from pydantic import BaseModel, Field
 from fastapi import HTTPException
+import logging
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("api_avc")
 
 app = FastAPI(title="API Prediction AVC")
 
@@ -40,6 +45,7 @@ class Patient(BaseModel):
 @app.post("/predict")
 def predict(patient: Patient):
     try:
+        logger.info(f"Requete recue : age={patient.age}, hypertension={patient.hypertension}")
         df = pd.DataFrame([patient.dict()])
 
         colonnes_categorielles = ['gender', 'ever_married', 'work_type',
@@ -60,7 +66,7 @@ def predict(patient: Patient):
             niveau_risque = "modere"
         else:
             niveau_risque = "faible"
-
+        logger.info(f"Prediction : stroke_risque={int(prediction)}, probabilite={round(float(probabilite),4)}")
         return {
             "stroke_risque": int(prediction),
             "probabilite": round(float(probabilite), 4),
