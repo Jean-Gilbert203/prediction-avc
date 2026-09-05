@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Prédiction du risque d'AVC</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="conteneur">
+        <h1>Prédiction du risque d'AVC</h1>
+        <form id="formulaire">
+            <div class="grille">
+                <label>Genre
+                    <select name="gender">
+                        <option value="Male">Homme</option>
+                        <option value="Female">Femme</option>
+                    </select>
+                </label>
+                <label>Hypertension
+                    <select name="hypertension">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
+                </label>
+                <label>Age
+                    <input type="number" name="age" min="0" max="120" required>
+                </label>
+                <label>Maladie cardiaque
+                    <select name="heart_disease">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
+                </label>
+                <label>Déjà marié(e)
+                    <select name="ever_married">
+                        <option value="Yes">Oui</option>
+                        <option value="No">Non</option>
+                    </select>
+                </label>
+                <label>Glycemie moyenne (mg/dL)
+                    <input type="number" step="0.01" name="avg_glucose_level" required>
+                </label>
+                <label id="label-work-type">Type de travail
+                    <select name="work_type" id="work-type">
+                        <option value="Private">Privé</option>
+                        <option value="Self-employed">Indépendant</option>
+                        <option value="Govt_job">Fonction publique</option>
+                        <option value="children">Enfant</option>
+                        <option value="Never_worked">Jamais travaillé</option>
+                    </select>
+                </label>
+                <label>IMC
+                    <input type="number" step="0.01" name="bmi" required>
+                </label>
+                <label>Type de residence
+                    <select name="Residence_type">
+                        <option value="Urban">Urbain</option>
+                        <option value="Rural">Rural</option>
+                    </select>
+                </label>
+                <label>Statut tabagique
+                    <select name="smoking_status">
+                        <option value="never smoked">N'a jamais fumé</option>
+                        <option value="formerly smoked">Ancien fumeur</option>
+                        <option value="smokes">Fumeur</option>
+                        <option value="Unknown">Inconnu</option>
+                    </select>
+                </label>
+            </div>
+            <button type="submit">Prédire</button>
+        </form>
+        <div id="resultat"></div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
