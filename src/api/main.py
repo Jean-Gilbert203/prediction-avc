@@ -5,12 +5,17 @@ from pydantic import BaseModel
 from pydantic import BaseModel, Field
 from fastapi import HTTPException
 import logging
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("api_avc")
 
 app = FastAPI(title="API Prediction AVC")
+
+app.mount("/static", StaticFiles(directory="front-end"), name="static")
 
 artefact = joblib.load("modele/modele_avc.pkl")
 modele = artefact["modele"]
@@ -21,7 +26,8 @@ colonnes_features = artefact["colonnes_features"]
 
 @app.get("/")
 def accueil():
-    return {"message": "API de prediction du risque d'AVC"}
+    return FileResponse("front-end/index.html")
+
 
 
 @app.get("/health")
