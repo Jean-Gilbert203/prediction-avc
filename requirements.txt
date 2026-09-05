@@ -14,3 +14,6 @@ jupyter
 joblib
 pytest
 pydantic
+cryptography<44
+pyOpenSSL<=24.2.1
+httpx
