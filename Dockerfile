@@ -14,15 +14,31 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copie du reste du projet 
 COPY . .
 
-# --- CONFIGURATION DVC POUR LE CLOUD ---
+# --- CONFIGURATION DVC ---
 ARG GDRIVE_CLIENT_ID
 ARG GDRIVE_CLIENT_SECRET
 ARG GDRIVE_REFRESH_TOKEN
 
-# Création de l'authentification DVC silencieuse
+# Création du fichier credentials complet
 RUN mkdir -p /root/.config/dvc/ && \
-    echo "{\"client_id\": \"$GDRIVE_CLIENT_ID\", \"client_secret\": \"$GDRIVE_CLIENT_SECRET\", \"refresh_token\": \"$GDRIVE_REFRESH_TOKEN\"}" > /root/.config/dvc/gdrive-user-credentials.json && \
-    dvc remote modify storage --local gdrive_user_credentials_file /root/.config/dvc/gdrive-user-credentials.json && \
+    echo "{\
+    \"access_token\": null,\
+    \"client_id\": \"$GDRIVE_CLIENT_ID\",\
+    \"client_secret\": \"$GDRIVE_CLIENT_SECRET\",\
+    \"refresh_token\": \"$GDRIVE_REFRESH_TOKEN\",\
+    \"token_uri\": \"https://oauth2.googleapis.com/token\",\
+    \"token_expiry\": null,\
+    \"user_agent\": null,\
+    \"revoke_uri\": \"https://oauth2.googleapis.com/revoke\",\
+    \"id_token\": null,\
+    \"id_token_jwt\": null,\
+    \"token_response\": null,\
+    \"invalid\": false,\
+    \"_class\": \"OAuth2Credentials\",\
+    \"_module\": \"oauth2client.client\"\
+    }" > /root/.config/dvc/gdrive-user-credentials.json
+
+RUN dvc remote modify storage --local gdrive_user_credentials_file /root/.config/dvc/gdrive-user-credentials.json && \
     dvc pull
 
 # --- LANCEMENT ---
