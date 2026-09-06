@@ -23,15 +23,31 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Configuration DVC et Recuperation modele
+      - name: Configurer DVC et Recuperation modele
         env:
           GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
           GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
           GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
         run: |
           mkdir -p ~/.config/dvc/
-          echo "{\"client_id\": \"$GDRIVE_CLIENT_ID\", \"client_secret\": \"$GDRIVE_CLIENT_SECRET\", \"refresh_token\": \"$GDRIVE_REFRESH_TOKEN\"}" > ~/.config/dvc/gdrive-user-credentials.json
+          cat <<EOF > ~/.config/dvc/gdrive-user-credentials.json
+          {
+            "client_id": "$GDRIVE_CLIENT_ID",
+            "client_secret": "$GDRIVE_CLIENT_SECRET",
+            "refresh_token": "$GDRIVE_REFRESH_TOKEN",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "user_agent": null,
+            "revoke_uri": "https://oauth2.googleapis.com/revoke",
+            "id_token": null,
+            "id_token_jwt": null,
+            "invalid": false,
+            "_class": "OAuth2Credentials",
+            "_module": "oauth2client.client"
+          }
+          EOF
+          
           dvc remote modify storage --local gdrive_user_credentials_file ~/.config/dvc/gdrive-user-credentials.json
+          
           dvc pull
 
       - name: lancement des tests
