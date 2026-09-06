@@ -29,24 +29,26 @@ jobs:
           GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
           GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
         run: |
-          mkdir -p ~/.config/dvc/
-          cat <<EOF > ~/.config/dvc/gdrive-user-credentials.json
+          cat <<EOF > credentials.json
           {
+            "access_token": null,
             "client_id": "$GDRIVE_CLIENT_ID",
             "client_secret": "$GDRIVE_CLIENT_SECRET",
             "refresh_token": "$GDRIVE_REFRESH_TOKEN",
             "token_uri": "https://oauth2.googleapis.com/token",
+            "token_expiry": null,
             "user_agent": null,
             "revoke_uri": "https://oauth2.googleapis.com/revoke",
             "id_token": null,
             "id_token_jwt": null,
+            "token_response": null,
             "invalid": false,
             "_class": "OAuth2Credentials",
             "_module": "oauth2client.client"
           }
           EOF
           
-          dvc remote modify storage --local gdrive_user_credentials_file ~/.config/dvc/gdrive-user-credentials.json
+          dvc remote modify storage --local gdrive_user_credentials_file $(pwd)/credentials.json
           
           dvc pull
 
